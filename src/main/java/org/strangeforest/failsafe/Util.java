@@ -2,21 +2,22 @@ package org.strangeforest.failsafe;
 
 import java.util.concurrent.*;
 
+import dev.failsafe.function.*;
+
 public class Util {
 
    public static void sleep(int seconds) {
-      try {
-         TimeUnit.SECONDS.sleep(seconds);
-      }
-      catch (InterruptedException ignored) {
-      }
+      ignoreExceptions(() -> TimeUnit.SECONDS.sleep(seconds));
    }
 
    public static void sleepMillis(long millis) {
+      ignoreExceptions(() -> TimeUnit.MILLISECONDS.sleep(millis));
+   }
+
+   private static void ignoreExceptions(CheckedRunnable action) {
       try {
-         TimeUnit.MILLISECONDS.sleep(millis);
+         action.run();
       }
-      catch (InterruptedException ignored) {
-      }
+      catch (Throwable ignored) {}
    }
 }
