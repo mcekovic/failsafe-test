@@ -1,6 +1,7 @@
 package org.strangeforest.failsafe;
 
 import java.io.*;
+import java.util.*;
 
 import static org.strangeforest.failsafe.Util.*;
 
@@ -10,10 +11,10 @@ public class HelloServiceImpl implements HelloService {
    private static final String IO_ERROR = "IOError";
    private static final String DENY = "Deny";
    private static final String DELAY = "Delay";
+   private String prevName;
    private int counter;
 
    @Override public String hello(String name) {
-      counter++;
       if (name.startsWith(DELAY)) {
          int delaySeconds = Integer.parseInt(name.substring(DELAY.length()));
          sleep(delaySeconds);
@@ -22,6 +23,11 @@ public class HelloServiceImpl implements HelloService {
          fail();
       else if (name.startsWith(FAIL)) {
          int failureCount = Integer.parseInt(name.substring(FAIL.length()));
+         if (Objects.equals(name, prevName))
+            counter++;
+         else
+            counter = 1;
+         prevName = name;
          if (counter % (failureCount + 1) != 0)
             fail();
       }
